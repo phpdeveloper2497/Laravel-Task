@@ -13,14 +13,23 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+//
+//Route::get('/', function () {
+//    return view('welcome');
+//});
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+//dd(auth()->user());
+})->middleware(['auth', 'verified', 'check_role'])->name('dashboard');
+
+Route::get('/manager', function () {
+    return view('manager');
+})->middleware(['auth', 'verified', 'check_manager'])->name('manager');
+
+Route::get('/client', function () {
+    return view('client');
+})->middleware(['auth', 'verified', 'check_client'])->name('client');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,4 +37,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
