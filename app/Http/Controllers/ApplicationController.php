@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ApplicationStoreRequest;
 use App\Models\Application;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Http\Requests\UpdateApplicationRequest;
+use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
@@ -13,7 +15,7 @@ class ApplicationController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -27,9 +29,22 @@ class ApplicationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreApplicationRequest $request)
+    public function store(ApplicationStoreRequest $request)
     {
-        //
+        if ($request->hasFile('file')) {
+            $full_name = $request->file('file')->getClientOriginalName();
+            $path = $request->file('file')->storeAs("application_files"."/user_id-".$request->user()->id, $full_name, 'public');
+        }
+        $application = Application::create([
+            'user_id' => auth()->user()->id,
+            'message' => $request->message,
+            'subject' => $request->subject,
+            'file_url' => $path ??null
+        ]);
+
+//        return $this->success("Application created",$application);
+        return redirect()->back();
+
     }
 
     /**

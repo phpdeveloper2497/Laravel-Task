@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,23 +20,27 @@ use Illuminate\Support\Facades\Route;
 //    return view('welcome');
 //});
 
-Route::get('/', function () {
-    return view('dashboard');
-//dd(auth()->user());
-})->middleware(['auth', 'verified', 'check_role'])->name('dashboard');
+//Route::get('/', [MainController::class, 'dashboard'])->middleware(['check_role'])->name('dashboard');
 
-Route::get('/manager', function () {
-    return view('manager');
-})->middleware(['auth', 'verified', 'check_manager'])->name('manager');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/',function (){
+        return view('dashboard');
+    })->middleware(['check_role'])->name('dashboard');
 
-Route::get('/client', function () {
-    return view('client');
-})->middleware(['auth', 'verified', 'check_client'])->name('client');
+    Route::post('applications', [ApplicationController::class, 'store'])->name('applicationStore');
+//    Route::post('applications', [ApplicationController::class, 'store'])->name('applicationStore');
 
-Route::middleware('auth')->group(function () {
+    Route::get('/manager', [MainController::class, 'dashboard'])->middleware(['check_manager'])->name('manager');
+
+    Route::get('/client', function () {
+        return view('client');
+    })->middleware(['check_client'])->name('client');
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 require __DIR__ . '/auth.php';
